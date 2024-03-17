@@ -1,25 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./styles/global.scss";
+
+import { Modal } from "./components/shared/modal/modal.component";
+import { Suspense } from "react";
+import { ModalProvider } from "./context/modal.context";
+import { Layout } from "./components/layout/layout.component";
+import React from "react";
+import { FileUploader } from "./components/file-uploader/file-uploader.component";
+import { DataProvider } from "./context/data.context";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <DataProvider>
+      <ModalProvider>
+        <Layout>
+          <Suspense fallback={null}>
+            <Modal />
+          </Suspense>
+          <FileUploader />
+        </Layout>
+      </ModalProvider>
+    </DataProvider>
   );
 }
 

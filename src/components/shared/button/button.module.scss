@@ -1,0 +1,13 @@
+@use "src/styles/utilities/_variables" as vr;
+
+.button {
+  width: 150px;
+  max-width: 100%;
+  color: var(--colorWhite);
+  padding: 5px;
+  background-color: var(--colorSecondary);
+  border-radius: 10px;
+  border: none;
+  text-transform: uppercase;
+  font-weight: bold;
+}
