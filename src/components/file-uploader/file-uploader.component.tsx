@@ -1,7 +1,6 @@
-import { useRef, useState } from "react";
-import Papa from "papaparse";
+import React, { useRef, useState } from "react";
 import cx from "classnames";
-
+import * as XLSX from "xlsx";
 import styles from "./file-uploader.module.scss";
 
 import { Container } from "../shared/container/container.component";
@@ -10,7 +9,6 @@ import { useDataState } from "src/context/data.context";
 
 const FileUploader = () => {
   const state = useDataState();
-
   const { globalData } = state;
 
   const { handleData, validateData } = useData();
@@ -23,42 +21,46 @@ const FileUploader = () => {
   const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
     setIsDragActive(false);
-    handleFileChange(null, e.dataTransfer.files[0]);
+    handleFileChange(null, e.dataTransfer.files[0]).then(() => {});
   };
 
   const handleFileChange = async (
     e: React.ChangeEvent<HTMLInputElement> | null,
-    file?: any
+    file?: File | undefined
   ) => {
-    if (e !== null || file) {
-      try {
-        let currentFile = null;
+    if (!file && e?.target?.files) {
+      file = e.target.files[0];
+    }
 
-        if (file) {
-          currentFile = file;
-        } else {
-          currentFile = e!.target.files![0];
-        }
+    if (file) {
+      const reader = new FileReader();
+      const rABS = !!reader.readAsBinaryString;
 
-        const fileUrl = URL.createObjectURL(currentFile);
-        const response = await fetch(fileUrl);
-        const text = await response.text();
+      reader.onload = (event) => {
+        if (event?.target?.result) {
+          const binaryString = event.target.result;
+          const workbook = XLSX.read(binaryString, { type: rABS ? "binary" : "array" });
 
-        Papa.parse(text, {
-          complete: (result: any) => {
-            const error = validateData(result.data);
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-            if (error === null) {
-              console.log(result.data);
-              handleData(result.data);
-            }
+          const error = validateData(jsonData);
 
+          if (error) {
             return setError(error);
-          },
-          header: false,
-        });
-      } catch (error) {
-        console.error(error);
+          }
+
+          handleData(jsonData);
+        } else {
+          console.error("Error reading file.");
+        }
+      };
+
+      if (rABS) {
+        reader.readAsBinaryString(file);
+      } else {
+        reader.readAsArrayBuffer(file);
       }
     }
   };
@@ -78,13 +80,13 @@ const FileUploader = () => {
             })}
             ref={dropContainerRef}
             onDragOver={(e) => {
-              e.preventDefault(), false;
+              e.preventDefault();
             }}
             onDragEnter={() => setIsDragActive(true)}
             onDragLeave={() => setIsDragActive(false)}
             onDrop={handleDrop}
           >
-            <span className={styles.dropTitle}>Upuść pliki tutaj</span>
+            <span className={styles.dropTitle}>Upuść plik tutaj</span>
             lub
             <input
               type="file"
@@ -95,8 +97,8 @@ const FileUploader = () => {
               ref={inputRef}
             />
           </label>
-          {error ? <p className={styles.error}>{error}</p> : null}
         </>
+        {error ? <div className={styles.error}>{error}</div> : null}
       </div>
     </Container>
   );

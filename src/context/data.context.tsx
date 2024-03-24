@@ -1,13 +1,14 @@
 import React, { useContext, useReducer } from "react";
+import { RecordType } from "src/types/data";
 
 type State = {
-  globalData: any[];
+  globalData: RecordType[];
 };
 
 type Action =
   | {
     type: "ADD_GLOBAL_DATA";
-    data: any[];
+    data: RecordType[];
   }
 
 type Dispatch = (action: Action) => void;

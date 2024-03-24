@@ -31,7 +31,6 @@
 
 .content {
   position: relative;
-  min-height: 200px;
   padding: vr.$spacingSize60 vr.$spacingSize20 vr.$spacingSize60;
   display: flex;
   flex-direction: column;
@@ -42,7 +41,6 @@
 
 .closeButton {
   position: absolute;
-  z-index: 1;
   right: 18px;
   top: 18px;
   height: 24px;

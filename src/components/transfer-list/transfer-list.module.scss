@@ -1,0 +1,18 @@
+@use "src/styles/utilities/_variables" as vr;
+
+.wrapper {
+  margin-top: vr.$spacingSize40;
+  display: flex;
+  justify-content: center;
+}
+
+.table {
+  font-size: 1.2rem;
+  border-collapse: collapse;
+
+  tr, th, td {
+    border: 1px solid var(--colorTextGray);
+    padding: 0.5rem;
+    font-size: 11px;
+  }
+}
